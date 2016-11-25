@@ -1,7 +1,10 @@
 package lab3.geoPosition;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -44,9 +47,11 @@ public class MyDrawPanel extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	
 		g.drawString("Left mouse button to set new point", 10, 20);
 		g.drawString("Right mouse button to clear panel", 10, 40);
-
+		g.setColor(Color.GREEN);
+		((Graphics2D) g).setStroke(new BasicStroke(5));
 		int numberPoints = waypointX.size();
 		if (numberPoints > 1) {
 			for (int i = 1; i < numberPoints; i++) {

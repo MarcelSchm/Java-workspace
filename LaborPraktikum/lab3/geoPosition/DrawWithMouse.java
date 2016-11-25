@@ -16,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import lab1.geoPosition.GeoPosition;
+import lab2.geoPosition.GeoRoute;
 
 public class DrawWithMouse extends MouseAdapter implements ActionListener{
 	private MyDrawPanel panel;
@@ -24,22 +25,28 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 	private JMenuBar menuBar;
 	private JMenuItem newRoute,deleteRoute;
 	private double distance;
-	private GeoPosition route;
+	private GeoRoute[] route;
 	private JPanel buttonPanel;
 	private int routeNumber;
 	private JButton[] buttonArray = new JButton[10];
-	Container contentPane;
-
+	private Container contentPane;
+	private double lat,lon;
+	JLabel locationInformation;
+	JLabel distanceInformation;
+	
 	public DrawWithMouse() {
 		routeNumber = 0;
 		distance = 0;
-		route = new GeoPosition(0, 0);
+		route = new GeoRoute[10];
+		route[0] = new GeoRoute("route 1");
 
 		//create Frame and set properties	
 		frame = new JFrame("Lab43");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1550, 800);
 		frame.setLocation(20, 20);
+		lat = 0.0;
+		lon = 0.0;
 
 		// Create menubar and add to frame
 		menuBar = new JMenuBar();
@@ -52,8 +59,8 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 		menuOptions.add(deleteRoute);
 
 		//create label
-		JLabel distanceInformation = new JLabel("Entfernung: " + distance +" km");
-		JLabel locationInformation = new JLabel("Position:(lat , lon) = (" + route.getLatitude() + " , " + route.getLongitude() + ")");
+		distanceInformation = new JLabel("Entfernung: " + String.format("%2.3f", distance) +" km");
+		locationInformation = new JLabel("Position:(lat , lon) = (" + String.format("%2.3f", lat) + " , " + String.format("%2.3f", lon) + ") ");
 
 		//create ButtonPanel
 		buttonPanel = new JPanel();
@@ -92,16 +99,31 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 
 	}
 
+	public double map(int x, int in_min, int in_max, double out_min, double out_max) //map a range of values to nother range of values
+	{
+	  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+	
 	@Override
 	public void mousePressed(MouseEvent event) {
 		if(1 == event.getButton()){
 			System.out.printf("(x,y) = (%d, %d)\n", event.getX(), event.getY());
+			lat = map(event.getX(), 0, 768, 53.3325, 54.5720556);
+			lon = map(event.getY(), 0, 1024, 8.4375, 11.24725);
+			locationInformation.setText("Position:(lat , lon) = (" + String.format("%2.3f", lat) + " , " + String.format("%2.3f", lon) + ")");
+			route[0].addWaypoint(new GeoPosition(lat, lon));
+			distance = route[0].getDistance();
+			distanceInformation.setText("Entfernung: " + String.format("%2.3f", distance) +" km");
+			frame.pack(); //rearrange Size
+			frame.setVisible(true); //make visible
+			
 			panel.addPoint(event.getX(), event.getY());
 		}else if (event.getButton() == 3) {
 			System.out.println("Clear panel");
 			panel.clear();
 		}
 	}
+	
 	public static void main(String[] args) {
 		new DrawWithMouse();
 	}
