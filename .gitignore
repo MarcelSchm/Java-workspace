@@ -47,5 +47,6 @@ Temporary Items
 .apdisk
 *.lock
 .metadata
+.recommenders
 LaborPraktikum/.settings/org.eclipse.jdt.core.prefs
 *.project
