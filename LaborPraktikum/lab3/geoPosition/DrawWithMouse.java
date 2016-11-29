@@ -23,24 +23,24 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 	private static JFrame frame;
 	private JMenu menuOptions;
 	private JMenuBar menuBar;
-	private JMenuItem newRoute,deleteRoute;
-	private double distance;
+	private JMenuItem newRoute,deleteRoutepoints,deleteRoute;
+	private double distance,lat,lon;;
 	private GeoRoute[] route;
 	private JPanel buttonPanel;
-	private int buttonRouteNumber;
-	private int routeNumber;
+	private int buttonRouteNumber,routeNumber,mouseX,mouseY;
 	private JButton[] buttonArray = new JButton[10];
 	private Container contentPane;
-	private double lat,lon;
-	JLabel locationInformation;
-	JLabel distanceInformation;
+	JLabel locationInformation,distanceInformation;
 
 	public DrawWithMouse() {
 		buttonRouteNumber = 0;
 		routeNumber = 0;
 		distance = 0;
 		route = new GeoRoute[10];
-		route[routeNumber] = new GeoRoute("route " + routeNumber); //TODO
+
+		for(int i = 0; i<10;i++){
+			route[i] = new GeoRoute("route " + i);
+		}
 
 		//create Frame and set properties	
 		frame = new JFrame("Lab3");
@@ -55,15 +55,21 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 		frame.setJMenuBar(menuBar);
 		menuOptions = new JMenu("Optionen");
 		newRoute = new JMenuItem("Route hinzufügen");
-		deleteRoute = new JMenuItem("Route komplett löschen");
+		deleteRoutepoints = new JMenuItem("Alle Routenpunkte  löschen");
+		deleteRoute = new JMenuItem("Ausgewählte Route entfernen");
 		menuBar.add(menuOptions);
 		menuOptions.add(newRoute);
+		menuOptions.add(deleteRoutepoints);
+		menuOptions.addSeparator();
 		menuOptions.add(deleteRoute);
 
 		//create label
 		distanceInformation = new JLabel("Entfernung: " + String.format("%2.3f", distance) +" km");
-		locationInformation = new JLabel("Position:(lat , lon) = (" + String.format("%2.3f", lat) + " , " + String.format("%2.3f", lon) + ") ");
-
+		locationInformation = new JLabel("Position:(lat , lon) = (" + String.format("%06.3f", lat) + " , " + String.format("%06.3f", lon) + ") ");
+		
+		//create DrawPanel
+		panel = new MyDrawPanel();
+		
 		//create ButtonPanel
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
@@ -71,16 +77,15 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 		buttonPanel.add(locationInformation);
 		addButton();
 
-		//Event handling
+		//Event handling (button handling in addButton)
 		menuOptions.addActionListener(this);
-		buttonArray[0].addActionListener(this); //TODO
 		newRoute.addActionListener(this);
+		deleteRoutepoints.addActionListener(this);
 		deleteRoute.addActionListener(this);
-		panel = new MyDrawPanel();
 		panel.addMouseListener(this);
 		panel.addMouseMotionListener(this);
-		
-		
+
+
 		// create Contents
 		contentPane = frame.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
@@ -96,25 +101,35 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 
 	public void addButton(){
 		//System.out.println("addButton");
-		buttonArray[buttonRouteNumber] = new JButton("Route " +(buttonRouteNumber+1));
-		buttonPanel.add(buttonArray[buttonRouteNumber]);
-		frame.setVisible(true); //make visible
-		buttonRouteNumber++;
-
+		if(buttonRouteNumber <= 9){
+			buttonArray[buttonRouteNumber] = new JButton("Route " +String.format("%02d",(buttonRouteNumber+1)));
+			buttonPanel.add(buttonArray[buttonRouteNumber]);
+			routeNumber = buttonRouteNumber;
+			updateRoute();
+			
+			//Event handling
+			buttonArray[buttonRouteNumber].addActionListener(this); //TODO
+			buttonArray[buttonRouteNumber].setActionCommand("Button " + buttonRouteNumber);
+			frame.setVisible(true); //make visible
+			buttonRouteNumber++;
+		}
+		else{
+			JOptionPane.showMessageDialog(frame, "Es können nicht mehr als 10 Routen hinzugefügt werden", "Routen Maximum erreicht", JOptionPane.WARNING_MESSAGE);
+		}
 	}
 
-	public double map(int x, int inMin, int inMax, double outMin, double outMax){ //map a range of values to another range of values
+	public double map(double x, double inMin, double inMax, double outMin, double outMax){ //map a range of values to another range of values
 
 		return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 	}
-	
+
 	@Override
 	public void mousePressed(MouseEvent event) {
 		if(1 == event.getButton()){
 			System.out.printf("(x,y) = (%d, %d)\n", event.getX(), event.getY());
 			lat = map(event.getX(), 0, 768, 53.3325, 54.5720556);
 			lon = map(event.getY(), 0, 1024, 8.4375, 11.24725);
-			locationInformation.setText("Position:(lat , lon) = (" + String.format("%2.3f", lat) + " , " + String.format("%2.3f", lon) + ")");
+			locationInformation.setText("Position:(lat , lon) = (" + String.format("%06.3f", lat) + " , " + String.format("%06.3f", lon) + ")");
 			route[routeNumber].addWaypoint(new GeoPosition(lat, lon)); //TODO
 			distance = route[routeNumber].getDistance();//TODO
 			distanceInformation.setText("Entfernung: " + String.format("%2.3f", distance) +" km");
@@ -147,34 +162,91 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 		super.mouseMoved(event);
 		lat = map(event.getX(), 0, 768, 53.3325, 54.5720556);
 		lon = map(event.getY(), 0, 1024, 8.4375, 11.24725);
-		locationInformation.setText("Position:(lat , lon) = (" + String.format("%2.3f", lat) + " , " + String.format("%2.3f", lon) + ")");
-		
-		
+		locationInformation.setText("Position:(lat , lon) = (" + String.format("%06.3f", lat) + " , " + String.format("%06.3f", lon) + ")");
+		frame.pack(); //rearrange Size
+		frame.setVisible(true); //make visible
+
 	}
 
 	public static void main(String[] args) {
 		new DrawWithMouse();
 	}
 
+	public void updateRoute(){
+		panel.clearAll();
+		for(int i = 0;i < route[routeNumber].getNumberWaypoints();i++){
+			lat = route[routeNumber].getWaypoint(i).getLatitude();
+			lon = route[routeNumber].getWaypoint(i).getLongitude();
+			mouseX = (int) map(lat, 53.3325, 54.5720556, 0, 768);
+			mouseY = (int) map(lon, 8.4375, 11.24725, 0, 1024);
+			panel.addPoint(mouseX, mouseY);
+		}
+		distance = route[routeNumber].getDistance();
+		distanceInformation.setText("Entfernung: " + String.format("%2.3f", distance) +" km");
+		frame.pack(); //rearrange Size
+		frame.setVisible(true); //make visible
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		//System.out.println("action");
-
-		if(event.getSource()==buttonArray[0]){
-			
+		switch(event.getActionCommand()){
+		case "Button 0": routeNumber = 0;
+		updateRoute();
+		break;
+		case "Button 1": routeNumber = 1;
+		updateRoute();
+		break;
+		case "Button 2": routeNumber = 2;
+		updateRoute();
+		break;
+		case "Button 3": routeNumber = 3;
+		updateRoute();
+		break;
+		case "Button 4": routeNumber = 4;
+		updateRoute();
+		break;
+		case "Button 5": routeNumber = 5;
+		updateRoute();
+		break;
+		case "Button 6": routeNumber = 6;
+		updateRoute();
+		break;
+		case "Button 7": routeNumber = 7;
+		updateRoute();
+		break;
+		case "Button 8": routeNumber = 8;
+		updateRoute();
+		break;
+		case "Button 9": routeNumber = 9;
+		updateRoute();
+		break;
 		}
+
 		if(event.getSource() == newRoute){
 			addButton();	
 		}
-		
-		if(event.getSource() == deleteRoute){
+
+		if(event.getSource() == deleteRoutepoints){
 			panel.clearAll();
-			distance = 0;
 			int i = 0; //counter 
-			while(i<route[routeNumber].getNumberWaypoints()){//TODO
+			while(i < route[routeNumber].getNumberWaypoints()){
 				route[routeNumber].removeWaypoint(i);
 			}
+			updateRoute();
+		}
+		if(event.getSource() == deleteRoute){
+			System.out.println("LÖSCHEN!!!");
+			int i = 0;
+			while(i < route[routeNumber].getNumberWaypoints()){
+				route[routeNumber].removeWaypoint(i);
+			}
+			updateRoute();
+			buttonArray[routeNumber].remove(buttonArray[routeNumber]);
+			frame.pack(); //rearrange Size
+			frame.setVisible(true); //make visible
+			
 		}
 	}
-	
+
 }

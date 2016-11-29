@@ -33,9 +33,11 @@ public class MyDrawPanel extends JPanel {
 		
 	}
 	public void clearAll() {
+		if(waypointX.isEmpty()==false){
 		waypointX.clear();
 		waypointY.clear();
 		repaint();
+		}
 	}
 	
 	public void drawAgain(){
@@ -53,7 +55,7 @@ public class MyDrawPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		try {
-			BufferedImage image = ImageIO.read(new File("C:/Users/Marcel/Dropbox/Scripte/7. Semester/Java/workspace/Praktikum/lab3/geoPosition/OSM_Map.png"));
+			BufferedImage image = ImageIO.read(new File("C:/Users/User/workspace/JavaLabor/lab3/geoPosition/OSM_Map.png"));
 			g.drawImage(image, 0, 0, null);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -70,12 +72,15 @@ public class MyDrawPanel extends JPanel {
 		}
 		if (numberPoints > 1) {
 			for (int i = 1; i < numberPoints; i++) {
+				g.setColor(Color.GREEN);
 				g.drawLine(
 					waypointX.get(i - 1), 
 					waypointY.get(i - 1), 
 					waypointX.get(i), 
 					waypointY.get(i)
 				);
+				g.setColor(Color.ORANGE);
+				g.drawOval(waypointX.get(numberPoints - 1) - 3, waypointY.get(numberPoints - 1) - 3, 6, 6);
 			}
 		}
 	}
