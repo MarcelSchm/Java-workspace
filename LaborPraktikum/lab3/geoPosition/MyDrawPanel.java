@@ -16,8 +16,8 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class MyDrawPanel extends JPanel {
-	private ArrayList<Integer> waypointX = new ArrayList<Integer>();;
-	private ArrayList<Integer> waypointY = new ArrayList<Integer>();;
+	private ArrayList<Integer> waypointX = new ArrayList<Integer>();
+	private ArrayList<Integer> waypointY = new ArrayList<Integer>();
 	
 	public MyDrawPanel() {
 	}
@@ -32,11 +32,23 @@ public class MyDrawPanel extends JPanel {
 		repaint();
 		
 	}
-	public void clear() {
+	public void clearAll() {
 		waypointX.clear();
 		waypointY.clear();
 		repaint();
 	}
+	
+	public void drawAgain(){
+		//for(int i = 0; i <wa)
+	}
+	
+	public void removeLast(){
+		waypointX.remove(waypointX.size() - 1);
+		waypointY.remove(waypointY.size() - 1);
+		//System.out.println("waypoint Größe" + waypointX.size());
+		repaint();
+	}
+	
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -49,10 +61,13 @@ public class MyDrawPanel extends JPanel {
 		}
 	
 		g.drawString("Left mouse button to set new point", 10, 20);
-		g.drawString("Right mouse button to clear panel", 10, 40);
+		g.drawString("Right mouse button to delete last", 10, 40);
 		g.setColor(Color.GREEN);
 		((Graphics2D) g).setStroke(new BasicStroke(5));
 		int numberPoints = waypointX.size();
+		if(numberPoints > 0){
+			g.drawOval(waypointX.get(0) - 5, waypointY.get(0) - 5, 10, 10);
+		}
 		if (numberPoints > 1) {
 			for (int i = 1; i < numberPoints; i++) {
 				g.drawLine(
