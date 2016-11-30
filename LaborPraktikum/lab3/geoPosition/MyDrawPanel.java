@@ -55,8 +55,7 @@ public class MyDrawPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		try {
-			//ArbeitsPC: "C:/Users/User/workspace/JavaLabor/lab3/geoPosition/OSM_Map.png"
-			BufferedImage image = ImageIO.read(new File("C:/Users/Marcel/Dropbox/Scripte/7. Semester/Java/Java-workspace/LaborPraktikum/lab3/geoPosition/OSM_Map.png"));
+			BufferedImage image = ImageIO.read(new File("OSM_Map.png"));//relative to main folder
 			g.drawImage(image, 0, 0, null);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

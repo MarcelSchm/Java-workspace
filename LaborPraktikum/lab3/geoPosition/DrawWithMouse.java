@@ -241,8 +241,8 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 		if(event.getSource() == deleteRoute){
 			int i = 0;
 			System.out.println(buttonRouteNumber);
-			while(i < route[buttonRouteNumber].getNumberWaypoints()){
-				route[buttonRouteNumber].removeWaypoint(i);
+			while(i < route[buttonRouteNumber -1].getNumberWaypoints()){
+				route[buttonRouteNumber -1].removeWaypoint(i);
 			}
 			updateRoute();
 			buttonPanel.removeAll();
@@ -260,6 +260,7 @@ public class DrawWithMouse extends MouseAdapter implements ActionListener{
 			}
 			buttonRouteNumber = buttonArraylist.size();
 			updateRoute();
+			panel.repaint();
 
 			frame.pack(); //rearrange Size
 			frame.setVisible(true); //make visible
