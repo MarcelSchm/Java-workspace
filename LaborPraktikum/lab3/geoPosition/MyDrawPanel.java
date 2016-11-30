@@ -9,19 +9,19 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 
 @SuppressWarnings("serial")
 public class MyDrawPanel extends JPanel {
+	
 	private ArrayList<Integer> waypointX = new ArrayList<Integer>();
 	private ArrayList<Integer> waypointY = new ArrayList<Integer>();
-	
+
 	public MyDrawPanel() {
 	}
-	
+
 	public Dimension getPreferredSize() {
 		return new Dimension(1024, 768);
 	}
@@ -30,38 +30,39 @@ public class MyDrawPanel extends JPanel {
 		waypointX.add(x);
 		waypointY.add(y);
 		repaint();
-		
+
 	}
+
 	public void clearAll() {
 		if(waypointX.isEmpty()==false){
-		waypointX.clear();
-		waypointY.clear();
-		repaint();
+			waypointX.clear();
+			waypointY.clear();
+			repaint();
 		}
 	}
-	
+
 	public void drawAgain(){
 		//for(int i = 0; i <wa)
 	}
-	
+
 	public void removeLast(){
 		waypointX.remove(waypointX.size() - 1);
 		waypointY.remove(waypointY.size() - 1);
 		//System.out.println("waypoint Größe" + waypointX.size());
 		repaint();
 	}
-	
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		try {
-			BufferedImage image = ImageIO.read(new File("C:/Users/User/workspace/JavaLabor/lab3/geoPosition/OSM_Map.png"));
+			//ArbeitsPC: "C:/Users/User/workspace/JavaLabor/lab3/geoPosition/OSM_Map.png"
+			BufferedImage image = ImageIO.read(new File("C:/Users/Marcel/Dropbox/Scripte/7. Semester/Java/Java-workspace/LaborPraktikum/lab3/geoPosition/OSM_Map.png"));
 			g.drawImage(image, 0, 0, null);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 		g.drawString("Left mouse button to set new point", 10, 20);
 		g.drawString("Right mouse button to delete last", 10, 40);
 		g.setColor(Color.GREEN);
@@ -74,21 +75,16 @@ public class MyDrawPanel extends JPanel {
 			for (int i = 1; i < numberPoints; i++) {
 				g.setColor(Color.GREEN);
 				g.drawLine(
-					waypointX.get(i - 1), 
-					waypointY.get(i - 1), 
-					waypointX.get(i), 
-					waypointY.get(i)
-				);
+						waypointX.get(i - 1), 
+						waypointY.get(i - 1), 
+						waypointX.get(i), 
+						waypointY.get(i)
+						);
 				g.setColor(Color.ORANGE);
 				g.drawOval(waypointX.get(numberPoints - 1) - 3, waypointY.get(numberPoints - 1) - 3, 6, 6);
 			}
 		}
 	}
-	public static void main(String[] args) {
-		//new MyDrawPanel();
-	}
-
-
 
 }
 
