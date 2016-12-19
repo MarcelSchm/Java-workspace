@@ -16,9 +16,11 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class MyDrawPanel extends JPanel {
 
-	private ArrayList<Integer> waypointX = new ArrayList<Integer>();
-	private ArrayList<Integer> waypointY = new ArrayList<Integer>();
-
+	private ArrayList<Integer> waypointXRoute = new ArrayList<Integer>();
+	private ArrayList<Integer> waypointYRoute = new ArrayList<Integer>();
+	private ArrayList<Integer> waypointXVirtualRoute = new ArrayList<Integer>();
+	private ArrayList<Integer> waypointYVirtualRoute = new ArrayList<Integer>();
+	private ArrayList<Boolean> passedWaypoints= new ArrayList<Boolean>();;
 	public MyDrawPanel() {
 	}
 
@@ -26,26 +28,56 @@ public class MyDrawPanel extends JPanel {
 		return new Dimension(768, 512);
 	}
 
-	public void addPoint(int x, int y) {
-		waypointX.add(x);
-		waypointY.add(y);
+	public void addRoutePoint(int x, int y) {
+		waypointXRoute.add(x);
+		waypointYRoute.add(y);
+		repaint();
+
+	}
+	public void addVirtualRoutePoint(int x, int y) {
+		waypointXVirtualRoute.add(x);
+		waypointYVirtualRoute.add(y);
 		repaint();
 
 	}
 
-	public void clearAll() {
-		if(waypointX.isEmpty()==false){
-			waypointX.clear();
-			waypointY.clear();
+	public void clearRouteAll() {
+		if(waypointXRoute.isEmpty()==false){
+			waypointXRoute.clear();
+			waypointYRoute.clear();
+			repaint();
+		}
+	}
+	public void clearVirtualRouteAll() {
+		if(waypointXVirtualRoute.isEmpty()==false){
+			waypointXVirtualRoute.clear();
+			waypointYVirtualRoute.clear();
 			repaint();
 		}
 	}
 
 	public void removeLast(){
-		waypointX.remove(waypointX.size() - 1);
-		waypointY.remove(waypointY.size() - 1);
+		waypointXRoute.remove(waypointXRoute.size() - 1);
+		waypointYRoute.remove(waypointYRoute.size() - 1);
 		//System.out.println("waypoint Größe" + waypointX.size());
 		repaint();
+	}
+	public void clearPassedWaypoints(){
+		if(passedWaypoints.isEmpty()==false){
+		passedWaypoints.clear();
+		}
+		repaint();
+	}
+	
+	public void setPassedWaypoints(boolean[] passedWaypointsArray) {
+		clearPassedWaypoints();
+		for( boolean element: passedWaypointsArray){
+			passedWaypoints.add(element);
+		}
+		System.out.println("wegpunkte: ");
+		for(boolean element: passedWaypoints){
+		System.out.println(element);
+		}
 	}
 
 	public void paintComponent(Graphics g) {
@@ -57,39 +89,78 @@ public class MyDrawPanel extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		g.drawString("Left mouse button to set new point", 10, 20);
+		g.drawString("Start at Magenta Circle", 10, 20);
 		g.drawString("Right mouse button to delete last", 10, 40);
 		g.setColor(Color.GREEN);
 		((Graphics2D) g).setStroke(new BasicStroke(3)); //thickness of lines
-		int numberPoints = waypointX.size();
-		if(numberPoints > 0){
-			g.setColor(Color.GREEN);
-			g.drawOval(waypointX.get(0) - 3, waypointY.get(0) - 3, 6, 6);
+		int numberRoutePoints = waypointXRoute.size();
+		if(numberRoutePoints > 0){
+			g.setColor(Color.MAGENTA);
+			g.fillOval(waypointXRoute.get(0) - 8, waypointYRoute.get(0) -8, 16, 16);
+			((Graphics2D) g).setStroke(new BasicStroke(2)); //thickness of lines
+			g.setColor(Color.BLACK);
+			g.drawOval(waypointXRoute.get(0) - 8, waypointYRoute.get(0) -8, 16, 16);
+			((Graphics2D) g).setStroke(new BasicStroke(3)); //thickness of lines
+			
 		}
-		if (numberPoints > 1) {
-			for (int i = 1; i < numberPoints; i++) {
-				g.setColor(Color.GREEN);
+		if (numberRoutePoints > 1) {
+			for (int i = 1; i < numberRoutePoints; i++) {
+				g.setColor(Color.red);
 				g.drawLine(
-						waypointX.get(i - 1), 
-						waypointY.get(i - 1), 
-						waypointX.get(i), 
-						waypointY.get(i)
+						waypointXRoute.get(i - 1), 
+						waypointYRoute.get(i - 1), 
+						waypointXRoute.get(i), 
+						waypointYRoute.get(i)
 						);
 				g.setColor(Color.ORANGE);
-				g.drawOval(waypointX.get(numberPoints - 1) - 3, waypointY.get(numberPoints - 1) - 3, 6, 6);
+				g.drawOval(waypointXRoute.get(numberRoutePoints - 1) - 3, waypointYRoute.get(numberRoutePoints - 1) - 3, 6, 6);
 			}
-			for (int j = 1;j <numberPoints;j++){
-				g.setColor(Color.RED);
-				g.fillOval(waypointX.get(j) - 8, waypointY.get(j) -8, 16, 16);
+			System.out.println("Tabelle leer?" + passedWaypoints.isEmpty());
+			for (int j = 0;j <numberRoutePoints;j++){ //big red circles as waypoints
+				if(!passedWaypoints.isEmpty()){
+					if(passedWaypoints.get(j)){
+						g.setColor(Color.GREEN);
+					}
+					else {
+						g.setColor(Color.RED);
+					}
+				} else {
+					if(j>0){ // exception for first circle
+					g.setColor(Color.RED);
+					}
+				}
+
+				g.fillOval(waypointXRoute.get(j) - 8, waypointYRoute.get(j) -8, 16, 16);
 				((Graphics2D) g).setStroke(new BasicStroke(2)); //thickness of lines
 				g.setColor(Color.BLACK);
-				g.drawOval(waypointX.get(j) - 8, waypointY.get(j) -8, 16, 16);
+				g.drawOval(waypointXRoute.get(j) - 8, waypointYRoute.get(j) -8, 16, 16);
 				((Graphics2D) g).setStroke(new BasicStroke(3)); //thickness of lines
 			}
 
 		}
-
-
+		int numberVirtualRoutePoints = waypointXVirtualRoute.size();
+		if (numberVirtualRoutePoints > 1) {
+			for (int i = 1; i < numberVirtualRoutePoints; i++) {
+				g.setColor(Color.BLUE);
+				g.drawLine(
+						waypointXVirtualRoute.get(i - 1), 
+						waypointYVirtualRoute.get(i - 1), 
+						waypointXVirtualRoute.get(i), 
+						waypointYVirtualRoute.get(i)
+						);
+			}
+		}
 	}
+
+
 }
+
+
+
+
+
+
+
+
+
 

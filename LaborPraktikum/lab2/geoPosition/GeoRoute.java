@@ -70,4 +70,23 @@ public class GeoRoute implements Distance, Comparable<GeoRoute> {
 		return name + " (" + String.format("%.1f", getDistance()) + " km)";
 	}
 
+	public boolean[] passedWaypoints(GeoRoute routeToCompare){
+		int waypointIndex = 0;
+		int compareWaypointIndex = 0;
+		boolean[] isReached = new boolean[getNumberWaypoints()];
+		for(waypointIndex = 0;waypointIndex < getNumberWaypoints();waypointIndex++){
+			for(compareWaypointIndex = 0; compareWaypointIndex < routeToCompare.getNumberWaypoints();compareWaypointIndex++){
+				if(getWaypoint(waypointIndex).distanceInKm(routeToCompare.getWaypoint(compareWaypointIndex)) < 0.025){
+					isReached[waypointIndex]= true;
+				}
+			}
+			
+		}
+		for(boolean element: isReached){
+			if(element==true){
+			}
+		}
+		
+		return isReached;
+	}
 }
