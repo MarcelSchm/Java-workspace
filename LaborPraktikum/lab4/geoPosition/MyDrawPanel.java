@@ -20,7 +20,7 @@ public class MyDrawPanel extends JPanel {
 	private ArrayList<Integer> waypointYRoute = new ArrayList<Integer>();
 	private ArrayList<Integer> waypointXVirtualRoute = new ArrayList<Integer>();
 	private ArrayList<Integer> waypointYVirtualRoute = new ArrayList<Integer>();
-	private ArrayList<Boolean> passedWaypoints= new ArrayList<Boolean>();;
+	private ArrayList<Boolean> passedWaypoints= new ArrayList<Boolean>();
 	public MyDrawPanel() {
 	}
 
@@ -74,9 +74,9 @@ public class MyDrawPanel extends JPanel {
 		for( boolean element: passedWaypointsArray){
 			passedWaypoints.add(element);
 		}
-		System.out.println("wegpunkte: ");
+		//System.out.println("wegpunkte: ");
 		for(boolean element: passedWaypoints){
-		System.out.println(element);
+		//System.out.println(element);
 		}
 	}
 
@@ -115,7 +115,7 @@ public class MyDrawPanel extends JPanel {
 				g.setColor(Color.ORANGE);
 				g.drawOval(waypointXRoute.get(numberRoutePoints - 1) - 3, waypointYRoute.get(numberRoutePoints - 1) - 3, 6, 6);
 			}
-			System.out.println("Tabelle leer?" + passedWaypoints.isEmpty());
+			//System.out.println("Tabelle leer?" + passedWaypoints.isEmpty());
 			for (int j = 0;j <numberRoutePoints;j++){ //big red circles as waypoints
 				if(!passedWaypoints.isEmpty()){
 					if(passedWaypoints.get(j)){

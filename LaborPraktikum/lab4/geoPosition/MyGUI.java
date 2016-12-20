@@ -34,7 +34,8 @@ public class MyGUI extends MouseAdapter implements ActionListener{
 	private JPanel labelPanel;
 	private int mouseX,mouseY;
 	private Container contentPane;
-	JLabel locationInformation,routeDistanceInformation,virtualRouteDistanceInformation;
+	private JLabel locationInformation,routeDistanceInformation,virtualRouteDistanceInformation;
+	private boolean isDragged,isReleased;
 
 	public MyGUI() {
 
@@ -107,7 +108,7 @@ public class MyGUI extends MouseAdapter implements ActionListener{
 			lat = map(Integer.parseInt(coordinatesOfFile[0]), 0, 768,53.5566389, 53.5631389);
 			lon = map(Integer.parseInt(coordinatesOfFile[1]), 0, 512,10.008555555555555,10.025);
 			route.addWaypoint(new GeoPosition(lat, lon)); 
-	
+
 			distance = route.getDistance();
 			routeDistanceInformation.setText("Entfernung: " + String.format("%2.3f", distance) +" km");
 			frame.pack(); //rearrange Size
@@ -128,24 +129,44 @@ public class MyGUI extends MouseAdapter implements ActionListener{
 	@Override
 	public void mouseDragged(MouseEvent event) {
 		// TODO Auto-generated method stub
+		isDragged=true;
 		super.mouseDragged(event);
-		if ((event.getX() >= 0 && event.getX() <= 768) && (event.getY() >= 0 && event.getY() <= 512)) {
-			lat = map(event.getX(), 0, 768, 53.5566389, 53.5631389);
-			lon = map(event.getY(), 0, 512, 10.008555555555555, 10.025);
-			virtualRoute.addWaypoint(new GeoPosition(lat, lon)); //TODO
-			distance = virtualRoute.getDistance();//TODO
-			locationInformation.setText("Position:(lat , lon) = (" + String.format("%06.4f", lat) + " , "
-					+ String.format("%06.4f", lon) + ")");
-			virtualRouteDistanceInformation.setText("Jetzige Entfernung: " + String.format("%2.3f", distance) + " km");
-			frame.pack(); //rearrange Size
-			frame.setVisible(true); //make visible
-			panel.addVirtualRoutePoint(event.getX(), event.getY());
-			panel.setPassedWaypoints(route.passedWaypoints(virtualRoute));
-		}else {
-			JOptionPane.showMessageDialog(frame, "Sie laufen außerhalb der Map. Bitte innerhalb bleiben", "Bereichsüberschreitung", JOptionPane.INFORMATION_MESSAGE);
-			
+		if (isReleased == false) {
+			if ((event.getX() >= 0 && event.getX() <= 768) && (event.getY() >= 0 && event.getY() <= 512)) {
+				lat = map(event.getX(), 0, 768, 53.5566389, 53.5631389);
+				lon = map(event.getY(), 0, 512, 10.008555555555555, 10.025);
+				virtualRoute.addWaypoint(new GeoPosition(lat, lon)); //TODO
+				distance = virtualRoute.getDistance();//TODO
+				locationInformation.setText("Position:(lat , lon) = (" + String.format("%06.4f", lat) + " , "
+						+ String.format("%06.4f", lon) + ")");
+				virtualRouteDistanceInformation
+				.setText("Jetzige Entfernung: " + String.format("%2.3f", distance) + " km");
+				frame.pack(); //rearrange Size
+				frame.setVisible(true); //make visible
+				panel.addVirtualRoutePoint(event.getX(), event.getY());
+				panel.setPassedWaypoints(route.passedWaypoints(virtualRoute));
+			} else {
+				JOptionPane.showMessageDialog(frame, "Sie laufen außerhalb der Map. Bitte innerhalb bleiben",
+						"Bereichsüberschreitung", JOptionPane.INFORMATION_MESSAGE);
+				isReleased = true;
+			}
+		} else {
+			JOptionPane.showMessageDialog(frame, "Sie müssen erst die vorhandene Route löschen, um eine neue zu starten", "Neue Route nicht möglich", JOptionPane.ERROR_MESSAGE );
 		}
-		
+
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		super.mouseReleased(e);
+		isReleased = true;
+		if(isDragged == true){
+			JOptionPane.showMessageDialog(frame, "Sie haben die Route beendet. Ihre gelaufene Strecke beträgt: " +
+					String.format("%2.3f", distance) + " km. \n Bitte löschen Sie die Route, bevor Sie eine neue Starten",
+					"Route beendet", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	@Override
@@ -187,6 +208,8 @@ public class MyGUI extends MouseAdapter implements ActionListener{
 			}
 			panel.clearPassedWaypoints();
 			updateRoute();
+			isDragged = false;
+			isReleased = false;
 		}
 	}
 
